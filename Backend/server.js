@@ -1,6 +1,10 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
-import {connectDB} from "./database.js";
 import courseRoutes from "./routes/course.routes.js";
+
+console.log("ENV TEST:", process.env.MONGO_URI);
+import {connectDB} from "./database.js";
 const app = express();
 
 import cors from "cors";
