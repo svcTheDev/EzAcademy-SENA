@@ -1,11 +1,14 @@
 import mongoose, { get } from "mongoose";
+mongoose.set('bufferCommands', false);
 
 export const connectDB = async () => {
   const URI = process.env.MONGO_URI;
   try {
     console.log("🔌 Conectando a la base de datos...");
+
+
     await mongoose.connect(URI, {
-      dbName: "ezacademy",
+      serverSelectionTimeoutMS: 5000,
     });
     console.log("✅ Conectado a la base de datos EzAcademy");
   } catch (error) {
