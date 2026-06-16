@@ -3,13 +3,15 @@ dotenv.config(); // Siempre debe ir arriba del todo
 
 import express from "express";
 import cors from "cors";
-import { connectDB } from "./database.js";
+import { connectDB } from "./database/config.js";
+import { ENV } from './config/env.js';
 import courseRoutes from "./routes/course.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Usa el puerto del .env o el 3000 por defecto
+const PORT = ENV.PORT || 3000; // Usa el puerto del .env o el 3000 por defecto
 
+app.use(cors({}))
 // // --- MIDDLEWARES ---
 // app.use(cors({ origin: "http://localhost:8080" }));
 app.use(express.json()); // 🔥 ¡Faltaba esto! Si no lo pones, tus POST/PUT recibirán req.body vacío.
@@ -33,7 +35,7 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo exitosamente en el puerto ${PORT}`);
     });
-  } catch (error) {
+  } catch (error : string | any) {
     console.error(
       "🔴 Error crítico: No se pudo iniciar el servidor.",
       error.message,

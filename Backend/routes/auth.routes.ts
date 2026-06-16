@@ -1,12 +1,9 @@
 import { check } from "express-validator";
 import fieldValidator from "../middlewares/field-validators.js";
+import { validateJWT } from "../middlewares/validateJWT.js";
 
 import { Router } from "express";
-import {
-  createUser,
-  loginUser,
-  validateToken,
-} from "../controllers/auth.controller.js";
+import { createUser, loginUser, validateToken } from "../controllers/auth.controller.js";
 
 const router = Router();
 
@@ -39,6 +36,6 @@ router.post(
   loginUser,
 );
 
-router.post("/validation", validateToken);
+router.get("/validation", validateJWT, validateToken);
 
 export default router;

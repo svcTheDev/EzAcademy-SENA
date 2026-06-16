@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                          // Versión moderna de JS
+    "module": "NodeNext",                        //  ESTA ES LA CLAVE para Node moderno
+    "moduleResolution": "NodeNext",              //  ESTA ES LA CLAVE junto con la de arriba
+    "esModuleInterop": true,                     // Permite importar paquetes CommonJS como ES Modules
+    "forceConsistentCasingInFileNames": true,    // Evita problemas con mayúsculas/minúsculas
+    "strict": true,                              // Activa el modo estricto de TypeScript
+    "skipLibCheck": true                         // Salta la revisión de tipos de las librerías en node_modules
+  }
+}
