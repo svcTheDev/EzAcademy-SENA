@@ -2,7 +2,6 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../helpers/jwt.js";
 import express from "express";
-import response from "express";
 
 export const createUser = async (req : express.Request, res : express.Response) => {
   try {
@@ -39,8 +38,6 @@ export const loginUser = async (req : express.Request, res : express.Response) =
     const { email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
-
-    console.log(existingUser);
 
     if (!existingUser) {
       return res.status(404).json({ message: "El email no está registrado" });

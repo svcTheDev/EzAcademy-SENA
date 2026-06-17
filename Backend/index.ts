@@ -9,11 +9,10 @@ import courseRoutes from "./routes/course.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
-const PORT = ENV.PORT || 3000; // Usa el puerto del .env o el 3000 por defecto
+const PORT = ENV.PORT || 5000; 
 
 app.use(cors({}))
 // // --- MIDDLEWARES ---
-// app.use(cors({ origin: "http://localhost:8080" }));
 app.use(express.json()); // 🔥 ¡Faltaba esto! Si no lo pones, tus POST/PUT recibirán req.body vacío.
 
 // --- RUTAS ---

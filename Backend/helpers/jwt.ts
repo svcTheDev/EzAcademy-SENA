@@ -9,14 +9,15 @@ export interface UserToken {
 }
 
 
-export const generateToken = (user: UserToken) => {
+export const generateToken = (user: UserToken | any) => {
   return new Promise((resolve, reject) => {
-    const payload = {
-      uid: user.uid,
-      name: user.name,
-      email: user.email,
-    };
 
+    console.log("🔍 DATOS RECIBIDOS EN GENERATETOKEN:", user);
+    const payload = {
+      uid: user.uid || user.id || user._id?.toString(),
+      name: user.name,
+      email: user.email ?? "",
+    };
     const token = jsonwebtoken.sign(
       payload,
       ENV.JWT_SECRET,

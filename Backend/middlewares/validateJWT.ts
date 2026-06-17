@@ -1,6 +1,10 @@
 import jsonwebtoken from "jsonwebtoken";
+import express from "express";
+import {UserToken} from "../helpers/jwt.js";
+import { ENV } from "../config/env.js";
 
-export const validateJWT = (req, res, next) => {
+
+export const validateJWT = (req : express.Request, res : express.Response, next : express.NextFunction) => {
   const token = req.header("x-token");
 
   if (!token) {
@@ -10,11 +14,11 @@ export const validateJWT = (req, res, next) => {
   }
 
   try {
-    const { id, name, email } = jsonwebtoken.verify(
+    const { uid, name, email } = jsonwebtoken.verify(
       token,
-      process.env.JWT_SECRET,
-    );
-    req.uid = id;
+      ENV.JWT_SECRET,
+    ) as Required<UserToken>;
+    req.uid = uid;
     req.name = name;
     req.email = email;
 
