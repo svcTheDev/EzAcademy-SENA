@@ -26,19 +26,23 @@ router.post(
       .isFloat({ gt: 0 }),
 
     fieldvalidator,
-  ], createCourse,
+  ],
+  createCourse,
 );
 
-router.put("/:id", 
+router.put(
+  "/:id",
   [
-     check("title", "El título es obligatorio").not().isEmpty(),
+    check("title", "El título es obligatorio").not().isEmpty(),
     check("description", "La descripción es obligatoria").not().isEmpty(),
     check("price", "El precio es obligatorio")
       .not()
       .isEmpty()
       .isFloat({ gt: 0 }),
-      fieldvalidator,
-  ],updateCourse);
+    fieldvalidator
+  ],
+  updateCourse,
+);
 
 router.delete("/:id", deleteCourse);
 

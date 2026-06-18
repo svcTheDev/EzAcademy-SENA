@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config(); // Siempre debe ir arriba del todo
-
 import express from "express";
 import cors from "cors";
+import {notFoundHandler} from './middlewares/notFound.js'
+import {globalErrorHandler} from './middlewares/errorHandler.js'
 import { connectDB } from "./database/config.js";
 import { ENV } from './config/env.js';
 import courseRoutes from "./routes/course.routes.js";
@@ -18,6 +19,9 @@ app.use(express.json()); // 🔥 ¡Faltaba esto! Si no lo pones, tus POST/PUT re
 // --- RUTAS ---
 app.use("/courses", courseRoutes);
 app.use("/auth", authRoutes);
+
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
 
 // Ruta de prueba inicial
 app.get("/", (req, res) => {
