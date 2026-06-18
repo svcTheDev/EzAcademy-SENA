@@ -3,12 +3,16 @@ import fieldValidator from "../middlewares/field-validators.js";
 import { validateJWT } from "../middlewares/validateJWT.js";
 
 import { Router } from "express";
-import { createUser, loginUser, validateToken } from "../controllers/auth.controller.js";
+import {
+  createUser,
+  loginUser,
+  validateToken,
+} from "../controllers/auth.controller.js";
 
 const router = Router();
 
 router.post(
-  "/",
+  "/register",
   [
     check("name", "el nombre es obligatorio").notEmpty(),
     check("email", "el email es obligatorio").notEmpty(),

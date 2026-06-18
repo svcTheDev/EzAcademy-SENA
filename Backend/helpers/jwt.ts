@@ -12,7 +12,6 @@ export interface UserToken {
 export const generateToken = (user: UserToken | any) => {
   return new Promise((resolve, reject) => {
 
-    console.log("🔍 DATOS RECIBIDOS EN GENERATETOKEN:", user);
     const payload = {
       uid: user.uid || user.id || user._id?.toString(),
       name: user.name,

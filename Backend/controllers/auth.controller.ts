@@ -2,29 +2,34 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../helpers/jwt.js";
 import express from "express";
+import { CustomError } from "../middlewares/customError.js";
 
-export const createUser = async (req : express.Request, res : express.Response) => {
+export const createUser = async (
+  req: express.Request,
+  res: express.Response,
+) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ message: "El email ya está registrado" });
+      throw new CustomError("El correo ya está registrado", 400);
     }
 
-    const newUser = new User(req.body);
-
-    const token = await generateToken(newUser);
+    const newUser = new User({ name, email, password });
 
     const salt = bcrypt.genSaltSync(10);
     newUser.password = bcrypt.hashSync(password, salt);
 
     const savedUser = await newUser.save();
 
+    const token = await generateToken(newUser);
+
+    const userJson = savedUser.toJSON();
     res
       .status(201)
-      .json({ message: "Usuario creado exitosamente", user: savedUser, token });
+      .json({ message: "Usuario creado exitosamente", user: userJson, token });
   } catch (error: string | any) {
     res.status(500).json({
       message: "Error al crear el usuario",
@@ -33,32 +38,32 @@ export const createUser = async (req : express.Request, res : express.Response) 
   }
 };
 
-export const loginUser = async (req : express.Request, res : express.Response) => {
+export const loginUser = async (
+  req: express.Request,
+  res: express.Response,
+) => {
   try {
     const { email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
-      return res.status(404).json({ message: "El email no está registrado" });
+      throw new CustomError("Credenciales incorrectas (Email)", 400);
+    }
+
+    const validPassword = await bcrypt.compare(password, existingUser.password);
+    if (!validPassword) {
+      throw new CustomError("Credenciales incorrectas (Password)", 400);
     }
 
     const token = await generateToken(existingUser);
 
-    console.log(existingUser);
-    console.log(token);
-    await bcrypt.compare(password, existingUser.password, (err, isMatch) => {
-      if (!isMatch) {
-        return res.status(401).json({ message: "Contraseña incorrecta" });
-      } else {
-        res.json({
-          message: "Inicio de sesión exitoso",
-          user: existingUser,
-          token,
-        });
-      }
+    res.json({
+      message: "Inicio de sesión exitoso",
+      user: existingUser,
+      token,
     });
-  } catch (error : string | any) {
+  } catch (error: string | any) {
     res.status(500).json({
       message: "Error al iniciar sesión",
       error: error.message,
@@ -66,10 +71,13 @@ export const loginUser = async (req : express.Request, res : express.Response) =
   }
 };
 
-export const validateToken = async (req : express.Request, res : express.Response) => {
-  const { uid, name } = req;
+export const validateToken = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  const { uid, name, email } = req;
 
-  const token = await generateToken({ uid, name });
+  const token = await generateToken({ uid, name, email });
   try {
     res.json({
       token,

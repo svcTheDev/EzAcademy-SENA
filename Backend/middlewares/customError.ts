@@ -5,7 +5,6 @@ export class CustomError extends Error {
     super(message);
     this.statusCode = statusCode;
     
-    // Mantiene el rastro de la pila de llamadas (stack trace) nativo de JS
     Object.setPrototypeOf(this, CustomError.prototype);
   }
 }

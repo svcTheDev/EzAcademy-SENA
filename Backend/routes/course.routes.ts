@@ -11,7 +11,7 @@ import { check } from "express-validator";
 
 const router = Router();
 
-router.use(validateJWT); // Aplica el middleware a todas las rutas de este router
+router.use(validateJWT); 
 
 router.get("/", getCourses);
 

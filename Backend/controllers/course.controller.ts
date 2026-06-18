@@ -27,7 +27,7 @@ export const createCourse = async (
 
     const newCourse = new Course({
       ...req.body,
-      user: req.uid, // <-- Se lo inyectas de una vez aquí
+      user: req.uid,
     });
     const savedCourse = await newCourse.save();
 

@@ -1,4 +1,4 @@
-import mongoose, { get } from "mongoose";
+import mongoose from "mongoose";
 import { ENV } from "../config/env.js"; 
 mongoose.set("bufferCommands", false);
 

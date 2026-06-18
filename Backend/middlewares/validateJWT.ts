@@ -1,10 +1,13 @@
 import jsonwebtoken from "jsonwebtoken";
 import express from "express";
-import {UserToken} from "../helpers/jwt.js";
+import { UserToken } from "../helpers/jwt.js";
 import { ENV } from "../config/env.js";
 
-
-export const validateJWT = (req : express.Request, res : express.Response, next : express.NextFunction) => {
+export const validateJWT = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
   const token = req.header("x-token");
 
   if (!token) {
