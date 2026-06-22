@@ -1,25 +1,32 @@
 import { Request, Response, NextFunction } from "express";
+import { CustomError } from "./customError.js";
 
 export const globalErrorHandler = (
-  error: any,
+  error: unknown,
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  const isKnownError = error instanceof Error;
+
   console.error(
-    "❌ [Global Error Intercepted]:",
-    error.name,
+    "[Global Error Intercepted]:",
+    isKnownError ? error.name : "UnknownError",
     "->",
-    error.message,
+    isKnownError ? error.message : error,
   );
 
-  let statusCode = error.statusCode || 500;
-  let message = error.message || "Ocurrió un error interno en el servidor";
+  const statusCode = error instanceof CustomError ? error.statusCode : 500;
+  const message = isKnownError
+    ? error.message
+    : "Ocurrio un error interno en el servidor";
 
   res.status(statusCode).json({
     ok: false,
     message,
-
-    error: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    error:
+      process.env.NODE_ENV === "development" && isKnownError
+        ? error.stack
+        : undefined,
   });
 };

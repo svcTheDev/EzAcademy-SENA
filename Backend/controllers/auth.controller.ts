@@ -1,23 +1,24 @@
-import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../helpers/jwt.js";
-import express from "express";
+import express, { NextFunction } from "express";
 import { CustomError } from "../middlewares/customError.js";
+import user from "../models/user.js";
 
 export const createUser = async (
   req: express.Request,
   res: express.Response,
+  next: NextFunction,
 ) => {
   try {
-    const { name, email, password, role} = req.body;
+    const { name, email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await user.findOne({ email });
 
     if (existingUser) {
       throw new CustomError("El correo ya está registrado", 400);
     }
 
-    const newUser = new User({ name, email, password, role});
+    const newUser = new user({ name, email, password, role: "student" });
 
     const salt = bcrypt.genSaltSync(10);
     newUser.password = bcrypt.hashSync(password, salt);
@@ -30,22 +31,20 @@ export const createUser = async (
     res
       .status(201)
       .json({ message: "Usuario creado exitosamente", user: userJson, token });
-  } catch (error: string | any) {
-    res.status(500).json({
-      message: "Error al crear el usuario",
-      error: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
 export const loginUser = async (
   req: express.Request,
   res: express.Response,
+  next: NextFunction,
 ) => {
   try {
     const { email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await user.findOne({ email });
 
     if (!existingUser) {
       throw new CustomError("Credenciales incorrectas (Email)", 400);
@@ -63,30 +62,26 @@ export const loginUser = async (
       user: existingUser,
       token,
     });
-  } catch (error: string | any) {
-    res.status(500).json({
-      message: "Error al iniciar sesión",
-      error: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
 export const validateToken = async (
   req: express.Request,
   res: express.Response,
-) => {
-  const { uid, name, email } = req;
+    next: NextFunction,
 
-  const token = await generateToken({ uid, name, email });
+) => {
+  const { uid, name, email, role } = req;
+
+  const token = await generateToken({ uid, name, email, role });
   try {
     res.json({
       token,
       message: "Token válido",
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Error al validar el token",
-    });
+    next(error);
   }
 };
-

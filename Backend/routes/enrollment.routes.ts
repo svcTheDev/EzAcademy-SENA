@@ -3,7 +3,7 @@ import { check } from 'express-validator';
 import { validateJWT } from '../middlewares/validateJWT.js';
 import { isStudent } from '../middlewares/checkRole.js';
 import fieldValidator from '../middlewares/field-validators.js';
-import { createEnrollment, getEnrollmentsByUser } from '../controllers/enrollment.controller.js';
+import { createEnrollment, getMyEnrollments } from '../controllers/enrollment.controller.js';
 
 const router = Router();
 
@@ -19,7 +19,7 @@ router.post('/',
   createEnrollment
 );
 
-// Ver los cursos de un estudiante específico
-router.get('/user/:id', getEnrollmentsByUser);
+// Ver mis cursos como estudiante
+router.get('/me', getMyEnrollments);
 
 export default router;

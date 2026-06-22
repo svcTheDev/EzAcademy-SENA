@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { normalizeToJSON } from '../helpers/transformSchema.js';
+import { normalizeToJSON } from "../helpers/transformSchema.js";
 
 // example course
 
@@ -54,8 +54,7 @@ const courseSchema = new mongoose.Schema(
   },
 );
 
-courseSchema.method("toJSON", normalizeToJSON('cid')); 
-
+courseSchema.method("toJSON", normalizeToJSON("cid"));
 
 const Course = mongoose.model("Course", courseSchema);
 

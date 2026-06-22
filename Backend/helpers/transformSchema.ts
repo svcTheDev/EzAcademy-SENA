@@ -1,10 +1,20 @@
-export const normalizeToJSON = (idKey: 'uid' | 'cid' | 'eid' | 'sid') => {
-  return function (this: any) {
+type IdKey = "uid" | "cid" | "eid" | "sid";
+
+type SerializableDocument = {
+  toObject(): {
+    _id: { toString(): string };
+    __v?: unknown;
+    password?: unknown;
+    [key: string]: unknown;
+  };
+};
+
+export const normalizeToJSON = (idKey: IdKey) => {
+  return function (this: SerializableDocument) {
     const { __v, _id, password, ...object } = this.toObject();
-    
-    // Asignamos dinámicamente el ID con el nombre que le pasemos
+
     object[idKey] = _id.toString();
-    
+
     return object;
   };
 };

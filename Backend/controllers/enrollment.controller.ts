@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import Enrollment from "../models/Enrollment.js";
-import Course from "../models/Course.js";
+import enrollment from "../models/enrollment.js";
+import Course from "../models/course.js";
 import { CustomError } from "../middlewares/customError.js";
-import mongoose from "mongoose";
 
 export const createEnrollment = async (
   req: Request,
@@ -10,6 +9,7 @@ export const createEnrollment = async (
   next: NextFunction,
 ) => {
   try {
+    
     const { courseId } = req.body;
     const studentId = req.uid; // Extraído del token
 
@@ -23,7 +23,7 @@ export const createEnrollment = async (
     }
 
     // 🛠️ NUEVA VALIDACIÓN POR CÓDIGO: Verificar si ya existe esta inscripción
-    const existingEnrollment = await Enrollment.findOne({
+    const existingEnrollment = await enrollment.findOne({
       student: studentId,
       course: courseId,
     });
@@ -33,7 +33,7 @@ export const createEnrollment = async (
     }
 
     // 2. Verificar si hay cupos disponibles
-    const currentEnrollmentsCount = await Enrollment.countDocuments({
+    const currentEnrollmentsCount = await enrollment.countDocuments({
       course: courseId,
     });
     if (currentEnrollmentsCount >= course.capacity) {
@@ -44,7 +44,7 @@ export const createEnrollment = async (
     }
 
     // 3. Crear la inscripción
-    const newEnrollment = new Enrollment({
+    const newEnrollment = new enrollment({
       student: studentId,
       course: courseId,
     });
@@ -55,31 +55,32 @@ export const createEnrollment = async (
       ok: true,
       message: "Te has inscrito exitosamente al curso en vivo.",
     });
-  } catch (error: any) {
+  } catch (error) {
     next(error);
   }
 };
 
-
-export const getEnrollmentsByUser = async (req: Request, res: Response, next: NextFunction) => {
+export const getMyEnrollments = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const { id } = req.params; // El ID del estudiante que viene en la URL
+    const studentId = req.uid; 
 
-    // Buscamos las inscripciones de ese estudiante y traemos los datos del curso incrustados
-    const enrollments = await Enrollment.find({ student: id })
-      .populate({
-        path: 'course',
-        select: 'title description startDate capacity price instructor',
-        populate: {
-          path: 'instructor',
-          select: 'name email' // Trae también el nombre del profesor del curso
-        }
-      });
+    const enrollments = await enrollment.find({ student: studentId }).populate({
+      path: "course",
+      select: "title description startDate capacity price instructor",
+      populate: {
+        path: "instructor",
+        select: "name email", // Trae también el nombre del profesor del curso
+      },
+    });
 
     res.status(200).json({
       ok: true,
       count: enrollments.length,
-      enrollments
+      enrollments,
     });
   } catch (error) {
     next(error);

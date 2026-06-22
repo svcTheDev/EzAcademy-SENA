@@ -42,10 +42,12 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo exitosamente en el puerto ${PORT}`);
     });
-  } catch (error: string | any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+
     console.error(
       "🔴 Error crítico: No se pudo iniciar el servidor.",
-      error.message,
+      message,
     );
     process.exit(1);
   }

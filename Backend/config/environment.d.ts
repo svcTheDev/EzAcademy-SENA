@@ -6,13 +6,6 @@ declare global {
       MONGO_URI: string; 
     }
   }
-  namespace Express {
-    interface Request {
-      uid: string;
-      name: string;
-      email: string;
-    }
-  }
 }
 
 export {};

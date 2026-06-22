@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Course from "../models/Course.js";
+import course from "../models/course.js";
 import express, { NextFunction } from "express";
 import { CustomError } from "../middlewares/customError.js";
 
@@ -9,14 +9,14 @@ export const getCourses = async (
   next: NextFunction,
 ) => {
   try {
-    const courses = await Course.find().populate("user", "name email");
+    const courses = await course.find().populate("instructor", "name email");
 
     res.status(200).json({
       ok: true,
       count: courses.length,
       courses,
     });
-  } catch (error: string | any) {
+  } catch (error) {
     next(error);
   }
 };
@@ -27,9 +27,7 @@ export const createCourse = async (
   next: NextFunction,
 ) => {
   try {
-    console.log(req.uid);
-
-    const newCourse = new Course({
+    const newCourse = new course({
       ...req.body,
       instructor: req.uid,
     });
@@ -39,7 +37,7 @@ export const createCourse = async (
       message: "Curso creado exitosamente",
       course: savedCourse,
     });
-  } catch (error: string | any) {
+  } catch (error) {
     next(error);
   }
 };
@@ -59,7 +57,7 @@ export const updateCourse = async (
       );
     }
 
-    const courseFound = await Course.findById(CourseId);
+    const courseFound = await course.findById(CourseId);
 
     if (!courseFound) {
       throw new CustomError("Curso no encontrado en la base de datos", 404);
@@ -77,12 +75,12 @@ export const updateCourse = async (
       user: req.uid,
     };
 
-    const updatedCourse = await Course.findByIdAndUpdate(CourseId, newCourse, {
+    const updatedCourse = await course.findByIdAndUpdate(CourseId, newCourse, {
       new: true,
     });
 
     res.json({ message: "Curso actualizado", course: updatedCourse });
-  } catch (error: string | any) {
+  } catch (error) {
     return next(error);
   }
 };
@@ -102,7 +100,7 @@ export const deleteCourse = async (
       );
     }
 
-    const courseFound = await Course.findById(CourseId);
+    const courseFound = await course.findById(CourseId);
     if (!courseFound) {
       throw new CustomError("Curso no encontrado en la base de datos", 404);
     }
@@ -111,10 +109,10 @@ export const deleteCourse = async (
       throw new CustomError("No tienes permiso para eliminar este curso", 403);
     }
 
-    await Course.findByIdAndDelete(CourseId);
+    await course.findByIdAndDelete(CourseId);
 
     res.json({ message: "Curso eliminado" });
-  } catch (error: string | any) {
+  } catch (error) {
     next(error);
   }
 };
@@ -127,17 +125,17 @@ export const getCourseById = async (
   try {
     const { id } = req.params;
 
-    const course = await Course.findById(id).populate(
+    const courseId = await course.findById(id).populate(
       "instructor",
       "name email",
     );
-    if (!course) {
+    if (!courseId) {
       return res
         .status(404)
         .json({ ok: false, message: "Curso no encontrado" });
     }
 
-    res.status(200).json({ ok: true, course });
+    res.status(200).json({ ok: true, courseId });
   } catch (error) {
     next(error);
   }
