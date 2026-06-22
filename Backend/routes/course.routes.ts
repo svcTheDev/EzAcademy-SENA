@@ -6,24 +6,34 @@ import {
   createCourse,
   updateCourse,
   deleteCourse,
+  getCourseById,
 } from "../controllers/course.controller.js";
 import { check } from "express-validator";
+import { isAdminOrInstructor } from "../middlewares/checkRole.js";
 
 const router = Router();
 
-router.use(validateJWT); 
-
+// PÚBLICAS
 router.get("/", getCourses);
+router.get("/:id", getCourseById);
+
+// PRIVADOS
+router.use(validateJWT);
 
 router.post(
   "/",
   [
+    isAdminOrInstructor,
     check("title", "El título es obligatorio").not().isEmpty(),
     check("description", "La descripción es obligatoria").not().isEmpty(),
-    check("price", "El precio es obligatorio")
-      .not()
-      .isEmpty()
-      .isFloat({ gt: 0 }),
+    check("price", "El precio debe ser un número válido").isNumeric(),
+    check(
+      "startDate",
+      "La fecha de inicio es obligatoria y válida",
+    ).isISO8601(),
+    check("capacity", "La capacidad debe ser un número entero").isInt({
+      min: 1,
+    }),
 
     fieldvalidator,
   ],
@@ -33,17 +43,22 @@ router.post(
 router.put(
   "/:id",
   [
+    isAdminOrInstructor,
     check("title", "El título es obligatorio").not().isEmpty(),
     check("description", "La descripción es obligatoria").not().isEmpty(),
-    check("price", "El precio es obligatorio")
-      .not()
-      .isEmpty()
-      .isFloat({ gt: 0 }),
-    fieldvalidator
+    check("price", "El precio debe ser un número válido").isNumeric(),
+    check(
+      "startDate",
+      "La fecha de inicio es obligatoria y válida",
+    ).isISO8601(),
+    check("capacity", "La capacidad debe ser un número entero").isInt({
+      min: 1,
+    }),
+    fieldvalidator,
   ],
   updateCourse,
 );
 
-router.delete("/:id", deleteCourse);
+router.delete("/:id", isAdminOrInstructor, deleteCourse);
 
 export default router;

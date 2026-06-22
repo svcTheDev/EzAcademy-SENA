@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { normalizeToJSON } from '../helpers/transformSchema.js';
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -14,15 +15,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: { 
+    type: String, 
+    required: true, 
+    enum: ['student', 'instructor'],
+    default: 'student' 
+  }
+},{
+  timestamps: true, 
 });
 
-userSchema.method("toJSON", function () {
-  const { __v, _id, password, ...object } = this.toObject() as any;
-
-  object.uid = _id.toString();
-
-  return object;
-});
+userSchema.method("toJSON", normalizeToJSON('uid')); 
 
 const User = mongoose.model("User", userSchema);
 

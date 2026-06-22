@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { normalizeToJSON } from '../helpers/transformSchema.js';
 
 // example course
 
@@ -20,43 +21,41 @@ import mongoose, { Schema } from "mongoose";
 //   ]
 // }
 
-const courseSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  active: {
-    type: Boolean,
-    default: true,
-  },
-  lecture: [
-    {
+const courseSchema = new mongoose.Schema(
+  {
+    title: {
       type: String,
+      required: true,
     },
-  ],
-  user: 
-    {
+    description: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    instructor: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-});
+    startDate: { type: Date, required: true }, // Fecha y hora de la primera clase en vivo
+    capacity: { type: Number, required: true }, // Cupos máximos (ej: 30)
+    status: {
+      type: String,
+      required: true,
+      enum: ["active", "full", "cancelled"],
+      default: "active",
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
 
-courseSchema.method("toJSON", function () {
-  const { __v, _id, ...object } = this.toObject() as any;
+courseSchema.method("toJSON", normalizeToJSON('cid')); 
 
-  object.uid = _id.toString();
-
-  return object;
-});
 
 const Course = mongoose.model("Course", courseSchema);
 

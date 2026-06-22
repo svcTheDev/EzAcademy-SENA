@@ -6,6 +6,7 @@ export interface UserToken {
   name?: string;
   email?: string;
   password?: string;
+  role?: string
 }
 
 
@@ -16,6 +17,7 @@ export const generateToken = (user: UserToken | any) => {
       uid: user.uid || user.id || user._id?.toString(),
       name: user.name,
       email: user.email ?? "",
+      role: user.role
     };
     const token = jsonwebtoken.sign(
       payload,

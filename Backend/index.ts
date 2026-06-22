@@ -8,6 +8,8 @@ import { connectDB } from "./database/config.js";
 import { ENV } from "./config/env.js";
 import courseRoutes from "./routes/course.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import enrollmentRoutes from "./routes/enrollment.routes.js"
+import sessionRoutes from "./routes/session.routes.js";
 
 const app = express();
 const PORT = ENV.PORT || 5000;
@@ -19,6 +21,9 @@ app.use(express.json());
 // RUTAS
 app.use("/courses", courseRoutes);
 app.use("/auth", authRoutes);
+app.use("/enrollment", enrollmentRoutes);
+app.use("/classSession", sessionRoutes)
+
 
 // Ruta de prueba inicial
 app.get("/", (req, res) => {

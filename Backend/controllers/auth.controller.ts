@@ -9,7 +9,7 @@ export const createUser = async (
   res: express.Response,
 ) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role} = req.body;
 
     const existingUser = await User.findOne({ email });
 
@@ -17,7 +17,7 @@ export const createUser = async (
       throw new CustomError("El correo ya está registrado", 400);
     }
 
-    const newUser = new User({ name, email, password });
+    const newUser = new User({ name, email, password, role});
 
     const salt = bcrypt.genSaltSync(10);
     newUser.password = bcrypt.hashSync(password, salt);
@@ -89,3 +89,4 @@ export const validateToken = async (
     });
   }
 };
+

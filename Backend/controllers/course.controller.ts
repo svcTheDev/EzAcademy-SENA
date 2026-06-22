@@ -11,7 +11,11 @@ export const getCourses = async (
   try {
     const courses = await Course.find().populate("user", "name email");
 
-    res.status(200).json(courses);
+    res.status(200).json({
+      ok: true,
+      count: courses.length,
+      courses,
+    });
   } catch (error: string | any) {
     next(error);
   }
@@ -27,7 +31,7 @@ export const createCourse = async (
 
     const newCourse = new Course({
       ...req.body,
-      user: req.uid,
+      instructor: req.uid,
     });
     const savedCourse = await newCourse.save();
 
@@ -61,7 +65,7 @@ export const updateCourse = async (
       throw new CustomError("Curso no encontrado en la base de datos", 404);
     }
 
-    if (courseFound.user.toString() !== req.uid) {
+    if (courseFound.instructor.toString() !== req.uid) {
       throw new CustomError(
         "No tienes permiso para actualizar este curso",
         403,
@@ -103,17 +107,38 @@ export const deleteCourse = async (
       throw new CustomError("Curso no encontrado en la base de datos", 404);
     }
 
-    if (courseFound.user.toString() !== req.uid) {
-  throw new CustomError(
-        "No tienes permiso para eliminar este curso",
-        403,
-      );
+    if (courseFound.instructor.toString() !== req.uid) {
+      throw new CustomError("No tienes permiso para eliminar este curso", 403);
     }
 
     await Course.findByIdAndDelete(CourseId);
 
     res.json({ message: "Curso eliminado" });
   } catch (error: string | any) {
+    next(error);
+  }
+};
+
+export const getCourseById = async (
+  req: express.Request,
+  res: express.Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+
+    const course = await Course.findById(id).populate(
+      "instructor",
+      "name email",
+    );
+    if (!course) {
+      return res
+        .status(404)
+        .json({ ok: false, message: "Curso no encontrado" });
+    }
+
+    res.status(200).json({ ok: true, course });
+  } catch (error) {
     next(error);
   }
 };
