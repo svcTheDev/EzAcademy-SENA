@@ -1,45 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../hooks/useAuthStore";
+import { useToast } from "@/components/ui/use-toast"; // Ajusta la ruta a tus notificaciones de Shadcn/IA
 import "@/login.css";
 
-const Login = () => {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+export const Login = () => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Consumimos las utilidades del store real
+  const { startLogin, errorMessage, status } = useAuthStore();
+  const { toast } = useToast();
+
+  // Escuchamos si hay errores devueltos por el backend
+  useEffect(() => {
+    if (errorMessage !== undefined) {
+      toast({
+        variant: "destructive",
+        title: "Error de Autenticación",
+        description: errorMessage,
+      });
+    }
+  }, [errorMessage]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (email.trim() === "" || password.trim() === "") return;
 
-    const trimmedUsername = username.trim();
-    const trimmedPassword = password.trim();
-
-    if (!trimmedUsername || !trimmedPassword) {
-      window.alert("Completa el usuario y la contraseña.");
-      return;
-    }
-
-    sessionStorage.setItem(
-      "authUser",
-      JSON.stringify({ username: trimmedUsername, isAuthenticated: true }),
-    );
-
-    navigate("/");
+    // Disparamos la autenticación real hacia Node
+    startLogin({ email, password });
   };
 
   return (
     <div className="login-page">
       <form className="form" autoComplete="off" onSubmit={handleSubmit}>
-        <div className="control">
-          <h1>Regístrate</h1>
-        </div>
-
         <div className="control block-cube block-input">
           <input
             name="username"
             type="text"
-            placeholder="Nombre de usuario"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Dirección de email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <div className="bg-top">
             <div className="bg-inner"></div>
@@ -71,7 +72,11 @@ const Login = () => {
           </div>
         </div>
 
-        <button className="btn block-cube block-cube-hover" type="submit">
+        <button
+          className="btn block-cube block-cube-hover"
+          type="submit"
+          disabled={status === "checking"}
+        >
           <div className="bg-top">
             <div className="bg-inner"></div>
           </div>
@@ -81,8 +86,16 @@ const Login = () => {
           <div className="bg">
             <div className="bg-inner"></div>
           </div>
-          <div className="text">Crear usuario</div>
+          <div className="text">Iniciar sesión</div>
+          {status === "checking" ? "Validando..." : "Ingresar"}
         </button>
+
+        {/* <button
+          type="submit"
+          disabled={status === "checking"}
+          className="w-full bg-primary text-white p-2 rounded"
+        >
+        </button> */}
 
         <div className="credits">
           <Link to="/">Volver al inicio</Link>

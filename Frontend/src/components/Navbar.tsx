@@ -2,9 +2,12 @@ import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { LogOut, GraduationCap, User } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { status, user, startLogout } = useAuthStore();
   return (
     <nav className="bg-nav px-6 py-3 flex items-center justify-between">
       <div className="flex items-center gap-8">
@@ -33,6 +36,12 @@ const Navbar = () => {
           >
             Instructores
           </Link>
+          <Link
+            to="/my-courses"
+            className="text-sm text-muted-foreground hover:text-primary hover:border-primary border-b-2 transition-colors"
+          >
+            Mis cursos
+          </Link>
         </div>
       </div>
       <div className="flex items-center gap-4 ">
@@ -44,12 +53,41 @@ const Navbar = () => {
             className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none w-32"
           />
         </div>
-        <Link
-          to="/login"
-          className="hidden md:inline-block border border-accent text-accent text-sm px-4 py-1.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
-        >
-          Log in
-        </Link>
+        {/* 🚀 CONDICIONAL DE ESTADO Y SESIÓN */}
+        {status === "not-authenticated" ? (
+          // CASO A: Si NO está logueado, mostramos el botón de Iniciar Sesión
+          <Link
+            to="/login"
+            className="text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg transition-colors"
+          >
+            Iniciar Sesión
+          </Link>
+        ) : (
+          // CASO B: Si SÍ está logueado, mostramos su nombre y el botón de Cerrar Sesión
+          <div className="flex items-center gap-4">
+            {/* Info del usuario */}
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center border border-border">
+                <User className="w-4 h-4 text-foreground" />
+              </div>
+              <span className="hidden sm:inline">
+                Hola,{" "}
+                <strong className="text-foreground">
+                  {user?.name || "Estudiante"}
+                </strong>
+              </span>
+            </div>
+
+            {/* Botón de Logout */}
+            <button
+              onClick={startLogout}
+              className="flex items-center gap-2 text-xs font-semibold bg-destructive/10 text-destructive hover:bg-destructive/20 px-3 py-2 rounded-lg transition-colors"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Cerrar Sesión
+            </button>
+          </div>
+        )}
         <button
           className="md:hidden text-foreground z-[101]"
           onClick={() => setIsOpen(!isOpen)}
