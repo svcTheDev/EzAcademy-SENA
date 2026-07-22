@@ -5,6 +5,7 @@ import NotFound from "@/pages/NotFound";
 import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import MyCourses from "../pages/MyCourses.tsx";
+import InstructorCourses from "@/pages/InstructorCourses.tsx";
 
 export default function AppRouter() {
   const { status, checkAuthToken } = useAuthStore();
@@ -39,6 +40,7 @@ export default function AppRouter() {
         <Route>
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/" element={<Index />} />
+          <Route path="/instructor/courses" element={<InstructorCourses />} />
           <Route path="/my-courses" element={<MyCourses />} />
           <Route path="*" element={<NotFound />} />
         </Route>

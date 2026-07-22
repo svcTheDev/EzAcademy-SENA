@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import course from "../models/course.js";
 import express, { NextFunction } from "express";
+import user from "../models/user.js"; // 👈 ¡AÑADE ESTA LÍNEA! Esto fuerza a Mongoose a registrar el esquema de usuarios.
 import { CustomError } from "../middlewares/customError.js";
 
 export const getCourses = async (
@@ -125,10 +126,9 @@ export const getCourseById = async (
   try {
     const { id } = req.params;
 
-    const courseId = await course.findById(id).populate(
-      "instructor",
-      "name email",
-    );
+    const courseId = await course
+      .findById(id)
+      .populate("instructor", "name email");
     if (!courseId) {
       return res
         .status(404)
@@ -138,5 +138,27 @@ export const getCourseById = async (
     res.status(200).json({ ok: true, courseId });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getCoursesByInstructor = async (
+  req: express.Request,
+  res: express.Response,
+  next: NextFunction,
+) => {
+  try {
+    const instructorId = req.uid; // ID extraído del token
+    const courses = await course.find({ instructor: instructorId });
+
+    return res.status(200).json({
+      ok: true,
+      courses,
+    });
+  } catch (error) {
+    console.error("Error al obtener cursos del instructor:", error);
+    return res.status(500).json({
+      ok: false,
+      msg: "Hable con el administrador",
+    });
   }
 };

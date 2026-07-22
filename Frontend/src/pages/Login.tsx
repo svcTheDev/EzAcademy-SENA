@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../hooks/useAuthStore";
 import { useToast } from "@/components/ui/use-toast"; // Ajusta la ruta a tus notificaciones de Shadcn/IA
 import "@/login.css";
+import Navbar from "@/components/Navbar";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -33,6 +34,7 @@ export const Login = () => {
 
   return (
     <div className="login-page">
+      <Navbar />
       <form className="form" autoComplete="off" onSubmit={handleSubmit}>
         <div className="control block-cube block-input">
           <input

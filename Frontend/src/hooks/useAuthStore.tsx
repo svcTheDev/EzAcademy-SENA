@@ -16,40 +16,26 @@ export const useAuthStore = () => {
   const dispatch = useDispatch();
 
   // Función para iniciar sesión
-  const startLogin = async ({ email, password }: any) => {
-    dispatch(onChecking());
-
+  const startLogin = async ({ email, password }) => {
     try {
-      // 1. Hacemos la petición real a tu backend
       const { data } = await api.post("/auth/login", { email, password });
 
-      // 2. Guardamos el JWT real en el localStorage para mantener la sesión
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-      // 3. Despachamos al State Global de Redux el usuario con su rol real
       dispatch(
         onLogin({
-          uid: data.user?.uid || data.uid,
-          name: data.user?.name || data.name || data.user?.nombre, // 👈 Mapeo seguro
-          email: data.user?.email || data.email,
-          role: data.user?.role || data.role,
+          uid: data.user.uid || data.user._id,
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role,
         }),
       );
-    } catch (error: any) {
-      // 🚀 Imprime la respuesta exacta del backend en la consola
-      console.log("Cuerpo del error del backend:", error.response?.data);
-
-      const msg = error.response?.data?.message || "Credenciales incorrectas";
-      dispatch(onLogout(msg));
-      // ...
-
-      // Limpiamos el mensaje de error después de unos segundos
-      setTimeout(() => {
-        dispatch(clearErrorMessage());
-      }, 4000);
+    } catch (error) {
+      console.error("Error en login:", error);
+      // Manejo de error...
     }
   };
-
   // Función para cerrar sesión
   const startLogout = () => {
     localStorage.removeItem("token");
@@ -63,25 +49,30 @@ export const useAuthStore = () => {
     if (!token) return dispatch(onLogout(undefined));
 
     try {
-      // Tu backend debe tener una ruta tipo GET /auth/renew o /auth/check
-      // que use el middleware validateJWT y devuelva los datos frescos del usuario
       const { data } = await api.get("/auth/validation");
 
       // Renovamos el token con el nuevo que nos da el backend
       localStorage.setItem("token", data.token);
 
-      // Logueamos al usuario automáticamente con sus datos reales
+      // Extraemos la propiedad user que envía tu backend
+      const userBackend = data.user;
+
+      // Guardamos opcionalmente en localStorage para mayor persistencia
+      localStorage.setItem("user", JSON.stringify(userBackend));
+
+      // Logueamos al usuario automáticamente con sus datos reales mapeados
       dispatch(
         onLogin({
-          uid: data.uid,
-          name: data.name,
-          email: data.email,
-          role: data.role,
+          uid: userBackend.uid || userBackend._id,
+          name: userBackend.name,
+          email: userBackend.email,
+          role: userBackend.role, // "instructor"
         }),
       );
     } catch (error) {
       // Si el token expiró o es falso, borramos todo y al login
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
       dispatch(onLogout(undefined));
     }
   };

@@ -7,6 +7,7 @@ import {
   updateCourse,
   deleteCourse,
   getCourseById,
+  getCoursesByInstructor,
 } from "../controllers/course.controller.js";
 import { check } from "express-validator";
 import { isAdminOrInstructor } from "../middlewares/checkRole.js";
@@ -15,11 +16,14 @@ const router = Router();
 
 // PÚBLICAS
 router.get("/", getCourses);
-router.get("/:id", getCourseById);
 
 // PRIVADOS
 router.use(validateJWT);
 
+// GET /api/courses/instructor
+router.get("/instructor", isAdminOrInstructor, getCoursesByInstructor);
+
+router.get("/:id", getCourseById);
 router.post(
   "/",
   [

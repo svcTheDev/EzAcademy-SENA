@@ -67,21 +67,20 @@ export const loginUser = async (
   }
 };
 
-export const validateToken = async (
-  req: express.Request,
-  res: express.Response,
-    next: NextFunction,
+export const validateToken = async (req, res) => {
+  const { uid, name, email, role } = req; // O la forma en que guardes los datos en la request tras el validateJWT
 
-) => {
-  const { uid, name, email, role } = req;
+  // Opcional: Generar un nuevo JWT si quieres renovarlo
+  // const token = await generateJWT(uid, name, role);
 
-  const token = await generateToken({ uid, name, email, role });
-  try {
-    res.json({
-      token,
-      message: "Token válido",
-    });
-  } catch (error) {
-    next(error);
-  }
+  return res.status(200).json({
+    ok: true,
+    token: req.token || req.header("x-token"), // O el nuevo token generado
+    user: {
+      uid,
+      name,
+      email,
+      role,
+    },
+  });
 };
