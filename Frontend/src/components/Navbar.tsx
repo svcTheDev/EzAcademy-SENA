@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { LogOut, User } from "lucide-react";
+import {useCourseStore} from '@'
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
