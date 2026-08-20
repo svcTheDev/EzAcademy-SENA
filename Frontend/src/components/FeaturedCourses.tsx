@@ -4,16 +4,15 @@ import courseMarketing2 from "@/assets/course-marketing2.jpg";
 import { getCourses } from "@/lib/services/api.js";
 import { useEffect, useState } from "react";
 
-// Agregamos tanto _id como cid al tipo para soportar el contrato real de MongoDB
 interface Course {
   _id?: string;
-  cid: string;
+  cid?: string;
   title: string;
   description: string;
   price: number;
   capacity: number;
-  enrolledCount: number;
-  instructor: {
+  enrolledCount?: number;
+  instructor?: {
     name: string;
     email: string;
   };
@@ -24,17 +23,22 @@ const FeaturedCourses = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  // Estados de paginación
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
         const response = await getCourses();
 
-        // 🛡️ CORRECCIÓN DE CONTRATO (Codex):
         if (response && response.courses) {
           setCourses(response.courses);
+          setTotalPages(response.totalPages || 1);
         } else if (Array.isArray(response)) {
           setCourses(response);
+          setTotalPages(1);
         }
 
         setError(false);
@@ -47,19 +51,34 @@ const FeaturedCourses = () => {
     };
 
     fetchCourses();
-  }, []);
+  }, [page]);
 
-  // Manejo de estados visuales para evitar pantallas en blanco accidentales
+  const handleNext = () => {
+    if (page < totalPages) {
+      setPage((prev) => prev + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (page > 1) {
+      setPage((prev) => prev - 1);
+    }
+  };
+
   if (loading)
-    return <div className="text-center py-10 text-foreground">Cargando cursos en vivo...</div>;
-    
+    return (
+      <div className="text-center py-10 text-foreground font-medium">
+        Cargando cursos destacados...
+      </div>
+    );
+
   if (error)
     return (
       <div className="text-center py-10 text-destructive font-semibold">
         Hubo un error al conectar con el backend.
       </div>
     );
-    
+
   if (courses.length === 0)
     return (
       <div className="text-center py-10 text-muted-foreground">
@@ -71,29 +90,45 @@ const FeaturedCourses = () => {
     <section className="px-8 md:px-16 py-10">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-foreground text-xl font-bold">Cursos Destacados</h2>
-        <div className="flex gap-2">
-          <button className="bg-secondary p-1.5 rounded-full hover:bg-border transition-colors">
-            <ChevronLeft className="w-5 h-5 text-foreground" />
-          </button>
-          <button className="bg-secondary p-1.5 rounded-full hover:bg-border transition-colors">
-            <ChevronRight className="w-5 h-5 text-foreground" />
-          </button>
+
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-muted-foreground">
+            Pág. {page}/{totalPages}
+          </span>
+
+          <div className="flex gap-2">
+            <button
+              onClick={handlePrev}
+              disabled={page <= 1}
+              className="bg-secondary p-2 rounded-full hover:bg-border transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              title="Página Anterior"
+            >
+              <ChevronLeft className="w-5 h-5 text-foreground" />
+            </button>
+
+            <button
+              onClick={handleNext}
+              disabled={page >= totalPages}
+              className="bg-secondary p-2 rounded-full hover:bg-border transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              title="Página Siguiente"
+            >
+              <ChevronRight className="w-5 h-5 text-foreground" />
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-5 overflow-x-auto pb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
         {courses.map((course) => {
-          // Extraemos el ID real para la inscripción (priorizando el _id de Mongo)
           const courseId = course._id || course.cid || "";
 
           return (
             <CourseCard
               key={courseId}
-              id={courseId} // 🚀 Pasamos el ID real de MongoDB al CourseCard
+              id={courseId}
               image={courseMarketing2}
               description={course.description}
               title={course.title}
-              // Usamos el nombre real del instructor si viene del populate del backend
               instructor={course.instructor?.name || "Instructor Asignado"}
               rating={5}
               price={course.price}

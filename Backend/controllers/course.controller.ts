@@ -10,11 +10,32 @@ export const getCourses = async (
   next: NextFunction,
 ) => {
   try {
-    const courses = await course.find().populate("instructor", "name email");
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 4;
+
+    const skip = (page - 1) * limit;
+
+    const [courses, totalCourses] = await Promise.all([
+      course
+        .find()
+        .populate("instructor", "name email")
+        .sort({ createdAt: -1 }) 
+        .skip(skip)
+        .limit(limit),
+      course.countDocuments(),
+    ]);
+
+    const totalPages = Math.ceil(totalCourses / limit);
 
     res.status(200).json({
       ok: true,
       count: courses.length,
+      totalCourses,
+      totalPages,
+      currentPage: page,
+      limit,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
       courses,
     });
   } catch (error) {
