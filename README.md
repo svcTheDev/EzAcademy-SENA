@@ -163,4 +163,4 @@ La retrospectiva del proyecto documenta las decisiones tomadas durante el desarr
 
 ## Documentación
 
-- [Retrospectiva de V1](docs/retrospective.md)
+- [Retrospectiva de V1](Docs/retrospective.md)
