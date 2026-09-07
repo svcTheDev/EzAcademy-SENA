@@ -1,12 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import api from "../lib/services/api";
 import {
-  onChecking,
   onLogin,
   onLogout,
-  clearErrorMessage,
 } from "../store/auth/authSlice";
-import axios from "axios";
 
 export const useAuthStore = () => {
   // Extraemos las variables del authSlice desde Redux
