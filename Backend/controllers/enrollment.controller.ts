@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import enrollment from "../models/enrollment.js";
-import Course from "../models/course.js";
+import enrollment from "../models/Enrollment.js";
+import Course from "../models/Course.js";
 import { CustomError } from "../middlewares/customError.js";
 
 export const createEnrollment = async (

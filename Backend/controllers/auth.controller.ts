@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../helpers/jwt.js";
 import express, { NextFunction } from "express";
 import { CustomError } from "../middlewares/customError.js";
-import user from "../models/user.js";
+import user from "../models/User.js";
 
 export const createUser = async (
   req: express.Request,

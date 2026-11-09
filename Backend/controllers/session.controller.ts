@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import ClassSession from "../models/classSession.js";
-import Course from "../models/course.js";
+import ClassSession from "../models/ClassSession.js";
+import Course from "../models/Course.js";
 import { CustomError } from "../middlewares/customError.js";
 
 export const createSession = async (
