@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import course from "../models/course.js";
+import course from "../models/Course.js";
 import express, { NextFunction } from "express";
-import user from "../models/user.js"; // 👈 ¡AÑADE ESTA LÍNEA! Esto fuerza a Mongoose a registrar el esquema de usuarios.
+import user from "../models/User.js"; // 👈 ¡AÑADE ESTA LÍNEA! Esto fuerza a Mongoose a registrar el esquema de usuarios.
 import { CustomError } from "../middlewares/customError.js";
 
 export const getCourses = async (
