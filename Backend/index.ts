@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config(); 
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { notFoundHandler } from "./middlewares/notFound.js";
@@ -12,7 +11,7 @@ import enrollmentRoutes from "./routes/enrollment.routes.js"
 import sessionRoutes from "./routes/session.routes.js";
 
 const app = express();
-const PORT = ENV.PORT || 5000;
+const PORT = Number(process.env.PORT || ENV.PORT || 5000);
 
 app.use(cors({}));
 // MIDDLEWARES
@@ -39,9 +38,9 @@ async function startServer() {
   try {
     await connectDB();
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor corriendo exitosamente en el puerto ${PORT}`);
-    });
+   app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Servidor corriendo exitosamente en el puerto ${PORT}`);
+});
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
